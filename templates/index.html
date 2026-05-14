@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Attrition Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .form-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .form-group input[type="number"],
+        .form-group input[type="range"],
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input[type="number"]:focus,
+        .form-group input[type="range"]:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group.radio-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-option input[type="radio"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .range-value {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .results-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .prediction-result {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .prediction-result.will-leave {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            border-left: 5px solid #c92a2a;
+        }
+
+        .prediction-result.will-stay {
+            background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+            color: white;
+            border-left: 5px solid #2f9e44;
+        }
+
+        .prediction-result h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .prediction-result p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .probability-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-card .label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .metric-card .value {
+            color: #667eea;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .recommendations {
+            background: #e7f5ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .recommendations h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .recommendations ul {
+            margin-left: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .recommendations li {
+            margin-bottom: 8px;
+        }
+
+        .input-summary {
+            margin-top: 30px;
+        }
+
+        .input-summary h4 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .summary-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 5px;
+        }
+
+        .summary-item .key {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .summary-item .value {
+            color: #333;
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #ffe0e0;
+            color: #d32f2f;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #d32f2f;
+            display: none;
+            margin-top: 20px;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👥 Employee Attrition Predictor</h1>
+            <p>Machine Learning-Powered Employee Retention Intelligence</p>
+        </header>
+
+        <div class="main-content">
+            <div class="form-section">
+                <h2>Employee Information</h2>
+                <form id="predictionForm">
+                    <!-- Work Performance Section -->
+                    <h3 style="color: #667eea; font-size: 1.1em; margin-top: 20px; margin-bottom: 15px;">Work Performance & Evaluation</h3>
+                    
+                    <div class="form-group">
+                        <label for="satisfaction">Job Satisfaction Level (0-1)</label>
+                        <input type="range" id="satisfaction" name="satisfaction" min="0" max="1" step="0.1" value="0.5">
+                        <span class="range-value" id="satisfactionValue">0.5</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="evaluation">Last Evaluation Score (0-1)</label>
+                        <input type="range" id="evaluation" name="evaluation" min="0" max="1" step="0.1" value="0.5">
+                        <span class="range-value" id="evaluationValue">0.5</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="avgHours">Average Monthly Hours</label>
+                        <input type="number" id="avgHours" name="avg_hours" min="0" max="500" value="160">
+                    </div>
+
+                    <!-- Employment Details Section -->
+                    <h3 style="color: #667eea; font-size: 1.1em; margin-top: 20px; margin-bottom: 15px;">Employment Details</h3>
+
+                    <div class="form-group">
+                        <label for="tenure">Years at Company</label>
+                        <input type="number" id="tenure" name="tenure" min="0" max="50" value="3">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numProjects">Number of Projects</label>
+                        <input type="number" id="numProjects" name="num_projects" min="0" max="20" value="3">
+                    </div>
+
+                    <!-- Company Benefits & Position -->
+                    <h3 style="color: #667eea; font-size: 1.1em; margin-top: 20px; margin-bottom: 15px;">Company Benefits & Position</h3>
+
+                    <div class="form-group">
+                        <label>Experienced Work Accident</label>
+                        <div class="form-group radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="accidentNo" name="work_accident" value="0" checked>
+                                <label for="accidentNo" style="margin-bottom: 0;">No</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="accidentYes" name="work_accident" value="1">
+                                <label for="accidentYes" style="margin-bottom: 0;">Yes</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Promoted in Last 5 Years</label>
+                        <div class="form-group radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="promotionNo" name="promotion" value="0" checked>
+                                <label for="promotionNo" style="margin-bottom: 0;">No</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="promotionYes" name="promotion" value="1">
+                                <label for="promotionYes" style="margin-bottom: 0;">Yes</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Department & Salary -->
+                    <h3 style="color: #667eea; font-size: 1.1em; margin-top: 20px; margin-bottom: 15px;">Department & Salary</h3>
+
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <select id="department" name="department">
+                            <option value="Sales">Sales</option>
+                            <option value="Accounting">Accounting</option>
+                            <option value="HR">HR</option>
+                            <option value="IT">IT</option>
+                            <option value="Management">Management</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Product management">Product Management</option>
+                            <option value="RandD">R&D</option>
+                            <option value="Support">Support</option>
+                            <option value="Technical">Technical</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="salaryLevel">Salary Level</label>
+                        <select id="salaryLevel" name="salary_level">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="submit-btn">🔮 Predict Employee Attrition</button>
+                </form>
+
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <h2 style="color: #333; margin-bottom: 20px;">Prediction Results</h2>
+                
+                <div id="predictionResult"></div>
+
+                <div class="probability-metrics">
+                    <div class="metric-card">
+                        <div class="label">Probability of Staying</div>
+                        <div class="value" id="probabilityStay">0%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Probability of Leaving</div>
+                        <div class="value" id="probabilityLeave">0%</div>
+                    </div>
+                </div>
+
+                <div class="recommendations" id="recommendationsBox"></div>
+
+                <div class="input-summary">
+                    <h4>Input Summary</h4>
+                    <div class="summary-grid" id="summaryGrid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing employee data...</p>
+        </div>
+    </div>
+
+    <script>
+        // Update range value displays
+        document.getElementById('satisfaction').addEventListener('input', function() {
+            document.getElementById('satisfactionValue').textContent = this.value;
+        });
+
+        document.getElementById('evaluation').addEventListener('input', function() {
+            document.getElementById('evaluationValue').textContent = this.value;
+        });
+
+        // Form submission
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                satisfaction: parseFloat(document.getElementById('satisfaction').value),
+                evaluation: parseFloat(document.getElementById('evaluation').value),
+                num_projects: parseInt(document.getElementById('numProjects').value),
+                avg_hours: parseInt(document.getElementById('avgHours').value),
+                tenure: parseInt(document.getElementById('tenure').value),
+                work_accident: parseInt(document.querySelector('input[name="work_accident"]:checked').value),
+                promotion: parseInt(document.querySelector('input[name="promotion"]:checked').value),
+                department: document.getElementById('department').value,
+                salary_level: document.getElementById('salaryLevel').value
+            };
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultsSection').classList.remove('active');
+
+            // Send request
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Prediction failed');
+                return response.json();
+            })
+            .then(data => {
+                displayResults(data);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('resultsSection').classList.add('active');
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                showError('Error making prediction: ' + error.message);
+            });
+        });
+
+        function displayResults(data) {
+            const willLeave = data.prediction === 1;
+            const stayProb = (data.probability_stay * 100).toFixed(1);
+            const leaveProb = (data.probability_leave * 100).toFixed(1);
+
+            // Prediction result
+            const resultDiv = document.getElementById('predictionResult');
+            resultDiv.innerHTML = `
+                <div class="prediction-result ${willLeave ? 'will-leave' : 'will-stay'}">
+                    <h3>${willLeave ? '⚠️ High Risk - Employee May Leave' : '✅ Low Risk - Employee Likely to Stay'}</h3>
+                    <p>This employee has a <strong>${leaveProb}%</strong> probability of ${willLeave ? 'leaving' : 'staying with'} the company.</p>
+                </div>
+            `;
+
+            // Probability metrics
+            document.getElementById('probabilityStay').textContent = stayProb + '%';
+            document.getElementById('probabilityLeave').textContent = leaveProb + '%';
+
+            // Recommendations
+            const recBox = document.getElementById('recommendationsBox');
+            if (willLeave) {
+                recBox.innerHTML = `
+                    <h4>🎯 Recommendations for HR</h4>
+                    <ul>
+                        <li>Schedule a meeting to discuss satisfaction and concerns</li>
+                        <li>Review compensation and benefits competitiveness</li>
+                        <li>Discuss career development opportunities and growth paths</li>
+                        <li>Evaluate workload and working hours</li>
+                        <li>Identify what motivates this employee and align with goals</li>
+                    </ul>
+                `;
+            } else {
+                recBox.innerHTML = `
+                    <h4>🎯 Recommendations for HR</h4>
+                    <ul>
+                        <li>Continue supporting employee's growth and development</li>
+                        <li>Maintain regular check-ins to ensure continued satisfaction</li>
+                        <li>Consider leveraging for mentoring roles</li>
+                        <li>Ensure competitive compensation remains in place</li>
+                        <li>Plan succession and leadership development</li>
+                    </ul>
+                `;
+            }
+
+            // Input summary
+            const summaryGrid = document.getElementById('summaryGrid');
+            summaryGrid.innerHTML = `
+                <div class="summary-item"><div class="key">Satisfaction</div><div class="value">${data.input_summary.satisfaction.toFixed(2)}</div></div>
+                <div class="summary-item"><div class="key">Evaluation</div><div class="value">${data.input_summary.evaluation.toFixed(2)}</div></div>
+                <div class="summary-item"><div class="key">Projects</div><div class="value">${data.input_summary.num_projects}</div></div>
+                <div class="summary-item"><div class="key">Monthly Hours</div><div class="value">${data.input_summary.avg_hours}</div></div>
+                <div class="summary-item"><div class="key">Years at Company</div><div class="value">${data.input_summary.tenure}</div></div>
+                <div class="summary-item"><div class="key">Work Accident</div><div class="value">${data.input_summary.work_accident}</div></div>
+                <div class="summary-item"><div class="key">Promoted (5 yrs)</div><div class="value">${data.input_summary.promotion}</div></div>
+                <div class="summary-item"><div class="key">Department</div><div class="value">${data.input_summary.department}</div></div>
+                <div class="summary-item"><div class="key">Salary Level</div><div class="value">${data.input_summary.salary_level}</div></div>
+            `;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('active');
+        }
+    </script>
+</body>
+</html>
