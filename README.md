@@ -1,3 +1,15 @@
+---
+title: Employee Attrition Predictor
+emoji: 👥
+colorFrom: blue
+colorTo: purple
+sdk: streamlit
+sdk_version: "1.28.1"
+python_version: "3.10"
+app_file: app.py
+pinned: false
+---
+
 # 👥 Employee Attrition Prediction & HR Analytics
 
 A comprehensive Machine Learning project with an interactive web application for predicting employee attrition risk and providing HR insights.
