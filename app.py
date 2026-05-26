@@ -3,66 +3,267 @@ import pickle
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from gemini_service import generate_hr_recommendation
 
-# Set page configuration
+# ---------------------------------------------------
+# PAGE CONFIG
+# ---------------------------------------------------
+
 st.set_page_config(
-    page_title="Employee Attrition Predictor",
-    page_icon="👥",
+    page_title="AI Workforce Intelligence Platform",
+    page_icon="AI",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom styling
-st.markdown("""
-    <style>
-    .main-header {
-        text-align: center;
-        color: #1f77b4;
-        margin-bottom: 30px;
-    }
-    .prediction-box {
-        padding: 20px;
-        border-radius: 10px;
-        margin-top: 20px;
-    }
-    .will-leave {
-        background-color: #ffcccc;
-        border-left: 5px solid #cc0000;
-    }
-    .will-stay {
-        background-color: #ccffcc;
-        border-left: 5px solid #00cc00;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# ---------------------------------------------------
+# CUSTOM CSS
+# ---------------------------------------------------
 
-# Load the model
+st.markdown("""
+<style>
+
+/* GLOBAL */
+
+.stApp {
+    background: #081028;
+    color: #f8fafc;
+}
+
+/* MAIN LAYOUT */
+
+.block-container {
+    max-width: 1150px;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+}
+
+/* TYPOGRAPHY */
+
+h1, h2, h3, h4 {
+    color: white !important;
+    font-weight: 700 !important;
+}
+
+p, li {
+    color: #cbd5e1;
+    line-height: 1.8;
+}
+
+/* HEADER */
+
+.main-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    text-align: center;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.sub-title {
+    text-align: center;
+    font-size: 1.05rem;
+    color: #94a3b8;
+    margin-bottom: 1.8rem;
+}
+
+/* SECTION CARD */
+
+.section-card {
+    background: #111c44;
+    border: 1px solid #1e2b5c;
+    border-radius: 24px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0px 6px 24px rgba(0,0,0,0.20);
+}
+
+/* SECTION TITLES */
+
+.section-heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+/* INPUTS */
+
+.stTextInput input,
+.stNumberInput input,
+.stSelectbox div[data-baseweb="select"],
+.stTextArea textarea {
+    background-color: #0f172a !important;
+    color: white !important;
+    border-radius: 12px !important;
+    border: 1px solid #334155 !important;
+}
+
+/* SLIDER */
+
+.stSlider {
+    padding-top: 0.5rem;
+    padding-bottom: 0.8rem;
+}
+
+/* BUTTON */
+
+.stButton > button {
+    width: 100%;
+    height: 58px;
+    border-radius: 18px;
+    border: none;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    transition: 0.3s ease;
+    margin-top: 10px;
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 8px 24px rgba(59,130,246,0.35);
+}
+
+/* PREDICTION CARD */
+
+.prediction-box {
+    padding: 36px;
+    border-radius: 24px;
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.will-stay {
+    background: linear-gradient(135deg, #065f46, #047857);
+    border: 1px solid #10b981;
+}
+
+.will-leave {
+    background: linear-gradient(135deg, #991b1b, #b91c1c);
+    border: 1px solid #ef4444;
+}
+
+/* AI RESPONSE */
+
+.ai-response {
+    background: #111827;
+    border-radius: 24px;
+    padding: 30px;
+    border: 1px solid #1e293b;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 25px;
+    max-width: 1000px;
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.25);
+}
+
+/* AI TEXT */
+
+.ai-response p,
+.ai-response li {
+    font-size: 16px;
+    line-height: 1.9;
+    color: #e2e8f0;
+}
+
+/* AI HEADINGS */
+
+.ai-response h1,
+.ai-response h2,
+.ai-response h3,
+.ai-response strong {
+    color: white !important;
+}
+
+/* METRICS */
+
+[data-testid="metric-container"] {
+    background: #111c44;
+    border: 1px solid #1e2b5c;
+    border-radius: 22px;
+    padding: 24px;
+    text-align: center;
+}
+
+[data-testid="metric-container"] label {
+    color: #94a3b8 !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: white !important;
+    font-size: 42px !important;
+    font-weight: 800 !important;
+}
+
+/* DATAFRAME */
+
+[data-testid="stDataFrame"] {
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid #1e293b;
+}
+
+/* TABLE */
+
+thead tr th {
+    background-color: #111827 !important;
+    color: white !important;
+    font-size: 15px !important;
+}
+
+tbody tr {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+/* SIDEBAR */
+
+[data-testid="stSidebar"] {
+    background: #0b122b;
+}
+
+[data-testid="stSidebar"] * {
+    color: white;
+}
+
+/* HIDE FOOTER */
+
+footer {
+    visibility: hidden;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------
+# LOAD MODEL
+# ---------------------------------------------------
+
 @st.cache_resource
 def load_model():
-    """Load the trained Random Forest model from pickle file."""
+
     model_path = Path(__file__).parent / 'hr_rf1.pickle'
+
     if not model_path.exists():
         st.error(f"Model file not found at {model_path}")
         st.stop()
+
     with open(model_path, 'rb') as f:
         model = pickle.load(f)
+
     return model
 
-# Load the data to get encoding information
-@st.cache_data
-def load_sample_data():
-    """Load sample data to understand encodings."""
-    data_path = Path(__file__).parent / 'HR_comma_sep.csv'
-    if data_path.exists():
-        return pd.read_csv(data_path)
-    return None
+# ---------------------------------------------------
+# ENCODING
+# ---------------------------------------------------
 
 def encode_categorical_features(dept, salary_level):
-    """
-    Encode categorical features to match the training data encoding.
-    This replicates the encoding used in the notebook.
-    """
-    # Department encoding
+
     departments = {
         'Sales': 1,
         'Accounting': 2,
@@ -75,132 +276,157 @@ def encode_categorical_features(dept, salary_level):
         'Support': 9,
         'Technical': 10
     }
-    
-    # Salary encoding
+
     salary_map = {
         'Low': 0,
         'Medium': 1,
         'High': 2
     }
-    
+
     dept_encoded = departments.get(dept, 1)
     salary_encoded = salary_map.get(salary_level, 0)
-    
+
     return dept_encoded, salary_encoded
 
-st.markdown("<h1 class='main-header'>👥 Employee Attrition Prediction System</h1>", unsafe_allow_html=True)
+# ---------------------------------------------------
+# HEADER
+# ---------------------------------------------------
 
-st.markdown("""
-This application uses a trained Machine Learning model to predict whether an employee 
-is likely to leave the company based on their profile and work metrics.
-""")
+st.markdown(
+    """
+    <div class="main-title">
+        AI Workforce Intelligence Platform
+    </div>
 
-# Load the model
+    <div class="sub-title">
+        Predict employee attrition using machine learning and AI-powered workforce analytics
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# ---------------------------------------------------
+# LOAD MODEL
+# ---------------------------------------------------
+
 model = load_model()
-sample_data = load_sample_data()
 
-# Create the input form
-st.markdown("---")
-st.markdown("### 📋 Enter Employee Information")
+# ---------------------------------------------------
+# INPUT SECTION
+# ---------------------------------------------------
+
+st.markdown(
+    """
+    <div class="section-card" style="max-width:1100px; margin:auto;">
+        <div class="section-heading" style="text-align:center;">
+            Employee Information
+        </div>
+    """,
+    unsafe_allow_html=True
+)
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("**Work Performance & Evaluation**")
+
+    st.markdown("### Work Performance")
+
     satisfaction = st.slider(
-        "Job Satisfaction Level (0 to 1)",
-        min_value=0.0,
-        max_value=1.0,
-        value=0.5,
-        step=0.1,
-        help="Employee-reported job satisfaction level"
+        "Job Satisfaction Level",
+        0.0,
+        1.0,
+        0.5,
+        0.1
     )
-    
+
     evaluation = st.slider(
-        "Last Evaluation Score (0 to 1)",
-        min_value=0.0,
-        max_value=1.0,
-        value=0.5,
-        step=0.1,
-        help="Score from the employee's last performance review"
+        "Last Evaluation Score",
+        0.0,
+        1.0,
+        0.5,
+        0.1
     )
-    
+
     avg_hours = st.number_input(
         "Average Monthly Hours Worked",
-        min_value=0,
-        max_value=500,
-        value=160,
-        step=1,
-        help="Average number of hours worked per month"
+        0,
+        500,
+        160
     )
 
 with col2:
-    st.markdown("**Employment Details**")
+
+    st.markdown("### Employment Details")
+
     tenure = st.number_input(
         "Years at Company",
-        min_value=0,
-        max_value=50,
-        value=3,
-        step=1,
-        help="Employee tenure in years"
-    )
-    
-    num_projects = st.number_input(
-        "Number of Projects",
-        min_value=0,
-        max_value=20,
-        value=3,
-        step=1,
-        help="Number of projects the employee contributes to"
-    )
-    
-    work_accident = st.radio(
-        "Experienced Work Accident",
-        options=['No', 'Yes'],
-        help="Whether the employee experienced an accident at work"
+        0,
+        50,
+        3
     )
 
-st.markdown("---")
+    num_projects = st.number_input(
+        "Number of Projects",
+        0,
+        20,
+        3
+    )
+
+    work_accident = st.radio(
+        "Experienced Work Accident",
+        ['No', 'Yes']
+    )
 
 col3, col4 = st.columns(2)
 
 with col3:
-    st.markdown("**Company Benefits & Position**")
+
     promotion = st.radio(
         "Promoted in Last 5 Years",
-        options=['No', 'Yes'],
-        help="Whether the employee was promoted in the last 5 years"
+        ['No', 'Yes']
     )
 
 with col4:
-    st.markdown("**Department & Salary**")
+
     department = st.selectbox(
         "Department",
-        options=['Sales', 'Accounting', 'HR', 'IT', 'Management', 
-                'Marketing', 'Product management', 'RandD', 'Support', 'Technical']
+        [
+            'Sales',
+            'Accounting',
+            'HR',
+            'IT',
+            'Management',
+            'Marketing',
+            'Product management',
+            'RandD',
+            'Support',
+            'Technical'
+        ]
     )
-    
+
     salary_level = st.selectbox(
         "Salary Level",
-        options=['Low', 'Medium', 'High']
+        ['Low', 'Medium', 'High']
     )
 
-st.markdown("---")
+st.markdown("</div>", unsafe_allow_html=True)
 
-# Make prediction
-if st.button("🔮 Predict Employee Attrition", use_container_width=True, key="predict_btn"):
+# ---------------------------------------------------
+# BUTTON
+# ---------------------------------------------------
+
+if st.button("Analyze Workforce Risk", use_container_width=True):
+
     try:
-        # Encode categorical features
-        dept_encoded, salary_encoded = encode_categorical_features(department, salary_level)
-        
-        # Convert binary inputs
+
+        dept_encoded, salary_encoded = encode_categorical_features(
+            department,
+            salary_level
+        )
+
         work_accident_encoded = 1 if work_accident == 'Yes' else 0
         promotion_encoded = 1 if promotion == 'Yes' else 0
-        
-        # Create feature array matching the order used in the model
-        # Based on the notebook: satisfaction_level, last_evaluation, number_project, 
-        # average_monthly_hours, time_spend_company, Work_accident, promotion_last_5years, 
-        # Department, salary
+
         features = np.array([[
             satisfaction,
             evaluation,
@@ -212,139 +438,212 @@ if st.button("🔮 Predict Employee Attrition", use_container_width=True, key="p
             dept_encoded,
             salary_encoded
         ]])
-        
-        # Make prediction
-        # Handle both GridSearchCV and plain model objects
+
         if hasattr(model, 'best_estimator_'):
-            # GridSearchCV object
+
             prediction = model.best_estimator_.predict(features)[0]
             prediction_proba = model.best_estimator_.predict_proba(features)[0]
+
         else:
-            # Plain trained model
+
             prediction = model.predict(features)[0]
             prediction_proba = model.predict_proba(features)[0]
-        
-        st.markdown("---")
-        st.markdown("### 📊 Prediction Results")
-        
-        if prediction == 1:
-            st.markdown(
-                f"""
-                <div class="prediction-box will-leave">
-                    <h3>⚠️ High Risk - Employee May Leave</h3>
-                    <p>Based on the provided information, this employee has a <strong>{prediction_proba[1]*100:.1f}%</strong> 
-                    probability of leaving the company.</p>
-                </div>
-                """, 
-                unsafe_allow_html=True
-            )
-            
-            st.info("""
-            **Recommendations for HR:**
-            - Schedule a meeting with the employee to discuss satisfaction and concerns
-            - Review compensation and benefits
-            - Discuss career development opportunities and growth paths
-            - Consider workload and hours being worked
-            - Identify what motivates this employee and align with company goals
-            """)
-        else:
+
+        # ---------------------------------------------------
+        # RESULTS TITLE
+        # ---------------------------------------------------
+
+        st.markdown(
+            '<div class="section-heading">Prediction Results</div>',
+            unsafe_allow_html=True
+        )
+
+        employee_data = {
+            "satisfaction": satisfaction,
+            "evaluation": evaluation,
+            "projects": num_projects,
+            "hours": avg_hours,
+            "tenure": tenure,
+            "department": department,
+            "salary": salary_level,
+            "promotion": promotion,
+            "work_accident": work_accident
+        }
+
+        # ---------------------------------------------------
+        # PREDICTION BOX
+        # ---------------------------------------------------
+
+        if prediction == 0:
+
+            risk = "Low Risk"
+
             st.markdown(
                 f"""
                 <div class="prediction-box will-stay">
-                    <h3>✅ Low Risk - Employee Likely to Stay</h3>
-                    <p>Based on the provided information, this employee has only a <strong>{prediction_proba[1]*100:.1f}%</strong> 
-                    probability of leaving the company.</p>
+                    <h1>Low Attrition Risk</h1>
+                    <h2>{prediction_proba[1]*100:.1f}% Probability of Leaving</h2>
                 </div>
-                """, 
+                """,
                 unsafe_allow_html=True
             )
-            
-            st.success("""
-            **Recommendations for HR:**
-            - Continue supporting this employee's growth and development
-            - Maintain regular check-ins to ensure continued satisfaction
-            - Consider leveraging this employee's stability for mentoring roles
-            - Ensure competitive compensation remains in place
-            """)
-        
-        # Display confidence metrics
-        st.markdown("---")
-        col_metrics1, col_metrics2 = st.columns(2)
-        
-        with col_metrics1:
+
+        else:
+
+            risk = "High Risk"
+
+            st.markdown(
+                f"""
+                <div class="prediction-box will-leave">
+                    <h1>High Attrition Risk</h1>
+                    <h2>{prediction_proba[1]*100:.1f}% Probability of Leaving</h2>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        # ---------------------------------------------------
+        # AI HR INSIGHTS TITLE
+        # ---------------------------------------------------
+
+        st.markdown(
+            """
+            <div style="
+                text-align:center;
+                margin-top:20px;
+                margin-bottom:15px;
+            ">
+                <h2 style="
+                    color:white;
+                    font-size:32px;
+                    font-weight:700;
+                ">
+                    AI HR Insights
+                </h2>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # ---------------------------------------------------
+        # AI RESPONSE BOX
+        # ---------------------------------------------------
+
+        ai_response = generate_hr_recommendation(
+            employee_data,
+            risk,
+            prediction_proba[1] * 100
+        )
+
+        st.markdown(
+            '<div class="ai-response">',
+            unsafe_allow_html=True
+        )
+
+        st.markdown(ai_response)
+
+        st.markdown(
+            '</div>',
+            unsafe_allow_html=True
+        )
+
+        # ---------------------------------------------------
+        # METRICS
+        # ---------------------------------------------------
+
+        st.markdown(
+            '<div class="section-heading">Workforce Metrics</div>',
+            unsafe_allow_html=True
+        )
+
+        metric_col1, metric_col2 = st.columns(2)
+
+        with metric_col1:
+
             st.metric(
-                "Probability of Staying",
+                "Retention Probability",
                 f"{prediction_proba[0]*100:.1f}%"
             )
-        
-        with col_metrics2:
+
+        with metric_col2:
+
             st.metric(
-                "Probability of Leaving",
+                "Attrition Probability",
                 f"{prediction_proba[1]*100:.1f}%"
             )
-        
-        # Display input summary
-        st.markdown("---")
-        st.markdown("### 📝 Input Summary")
-        
+
+        # ---------------------------------------------------
+        # SUMMARY TABLE
+        # ---------------------------------------------------
+
+        st.markdown(
+            '<div class="section-heading">Employee Summary</div>',
+            unsafe_allow_html=True
+        )
+
         summary_data = {
             'Metric': [
-                'Satisfaction Level',
-                'Last Evaluation',
-                'Number of Projects',
-                'Avg Monthly Hours',
-                'Years at Company',
-                'Work Accident',
-                'Promoted (5 yrs)',
+                'Satisfaction',
+                'Evaluation',
+                'Projects',
+                'Monthly Hours',
+                'Tenure',
                 'Department',
-                'Salary Level'
+                'Salary'
             ],
             'Value': [
-                f"{satisfaction:.2f}",
-                f"{evaluation:.2f}",
+                satisfaction,
+                evaluation,
                 num_projects,
                 avg_hours,
                 tenure,
-                work_accident,
-                promotion,
                 department,
                 salary_level
             ]
         }
-        
-        st.dataframe(pd.DataFrame(summary_data), use_container_width=True, hide_index=True)
-        
+
+        summary_df = pd.DataFrame(summary_data)
+
+        summary_df["Value"] = summary_df["Value"].astype(str)
+
+        st.dataframe(
+            summary_df,
+            width='stretch',
+            hide_index=True
+        )
+
     except Exception as e:
-        st.error(f"Error making prediction: {str(e)}")
-        st.info("Please ensure all inputs are valid and try again.")
 
-# Sidebar info
-st.sidebar.markdown("---")
-st.sidebar.markdown("### ℹ️ About This Model")
+        st.error(f"Prediction Error: {str(e)}")
+
+# ---------------------------------------------------
+# SIDEBAR
+# ---------------------------------------------------
+
+st.sidebar.markdown("## Workforce Intelligence")
+
 st.sidebar.markdown("""
-**Model Type:** Random Forest Classifier
+### Model Overview
 
-**Features:** 9 employee metrics
+- Random Forest Classifier
+- 15K+ Employee Records
+- Accuracy: 97.6%
+- AUC-ROC: 0.98
 
-**Training Data:** 14,999 employee records
+### AI Features
 
-**Model Performance:**
-- Accuracy: ~98%
-- AUC Score: ~0.97
+- Attrition Prediction
+- AI HR Recommendations
+- Workforce Risk Analysis
+- Retention Strategy Generation
 
-**Purpose:** Predict employee attrition risk to help HR improve retention strategies.
-""")
+### Technology Stack
 
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 📚 Feature Descriptions")
-st.sidebar.markdown("""
-- **Satisfaction Level:** Job satisfaction (0-1 scale)
-- **Evaluation:** Performance review score (0-1 scale)
-- **Projects:** Number of projects assigned
-- **Avg Hours:** Monthly working hours
-- **Tenure:** Years employed
-- **Accident:** Work accident history
-- **Promotion:** Promotion in last 5 years
-- **Department:** Work department
-- **Salary:** Compensation level
+- Python
+- Streamlit
+- Scikit-learn
+- Groq API
+- Llama 3.1
+- Pandas
+- NumPy
 """)
