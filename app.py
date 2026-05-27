@@ -608,7 +608,7 @@ if st.button("Analyze Workforce Risk", use_container_width=True):
 
         st.dataframe(
             summary_df,
-            width='stretch',
+            use_container_width=True,,
             hide_index=True
         )
 
