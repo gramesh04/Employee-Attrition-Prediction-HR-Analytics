@@ -1,0 +1,37 @@
+# Large files - excluded from HF Space deployment
+hr_rf1.pickle
+HR_comma_sep.csv
+
+# Development files
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+.venv/
+venv/
+.idea/
+.vscode/
+
+# Jupyter notebooks
+*.ipynb
+
+# Documentation
+*.pdf
+DEPLOYMENT_COMPLETE.md
+DEPLOYMENT_GUIDE.md
+HF_AUTHENTICATION.md
+PROJECT_OVERVIEW.md
+QUICK_REFERENCE.md
+SETUP_GUIDE.md
+START_HERE.md
+WEBAPP_README.md
+
+# Alternative implementations
+app_flask.py
+quickstart.py
+train_and_save_model.py
+train_model_fast.py
+retrain_model.py
