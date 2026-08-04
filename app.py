@@ -151,12 +151,13 @@ p, li {
 .ai-response {
     background: #111827;
     border-radius: 24px;
-    padding: 30px;
+    padding: 28px;
     border: 1px solid #1e293b;
-    margin: auto;
-    margin-top: 10px;
-    margin-bottom: 25px;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
     max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
     box-shadow: 0px 6px 20px rgba(0,0,0,0.25);
 }
 
@@ -173,9 +174,10 @@ p, li {
 
 .ai-response h1,
 .ai-response h2,
-.ai-response h3,
-.ai-response strong {
-    color: white !important;
+.ai-response h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.8rem;
+    color: white;
 }
 
 /* METRICS */
@@ -503,30 +505,7 @@ if st.button("Analyze Workforce Risk", use_container_width=True):
             )
 
         # ---------------------------------------------------
-        # AI HR INSIGHTS TITLE
-        # ---------------------------------------------------
-
-        st.markdown(
-            """
-            <div style="
-                text-align:center;
-                margin-top:20px;
-                margin-bottom:15px;
-            ">
-                <h2 style="
-                    color:white;
-                    font-size:32px;
-                    font-weight:700;
-                ">
-                    AI HR Insights
-                </h2>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        # ---------------------------------------------------
-        # AI RESPONSE BOX
+        # AI RESPONSE
         # ---------------------------------------------------
 
         ai_response = generate_hr_recommendation(
@@ -536,14 +515,26 @@ if st.button("Analyze Workforce Risk", use_container_width=True):
         )
 
         st.markdown(
-            '<div class="ai-response">',
-            unsafe_allow_html=True
-        )
+            f"""
+            <div style="
+                max-width:1000px;
+                margin:25px auto 10px auto;
+            ">
 
-        st.markdown(ai_response)
+                <div class="section-heading"
+                    style="
+                        text-align:center;
+                        margin-bottom:18px;
+                    ">
+                    AI HR Insights
+                </div>
 
-        st.markdown(
-            '</div>',
+                <div class="ai-response">
+                    {ai_response}
+                </div>
+
+            </div>
+            """,
             unsafe_allow_html=True
         )
 
@@ -646,4 +637,16 @@ st.sidebar.markdown("""
 - Llama 3.1
 - Pandas
 - NumPy
+""")
+
+st.sidebar.markdown("""
+**Satisfaction Level:** Job satisfaction (0-1 scale)
+- **Evaluation:** Performance review score (0-1 scale)
+- **Projects:** Number of projects assigned
+- **Avg Hours:** Monthly working hours
+- **Tenure:** Years employed
+- **Accident:** Work accident history
+- **Promotion:** Promotion in last 5 years
+- **Department:** Work department
+- **Salary:** Compensation level
 """)

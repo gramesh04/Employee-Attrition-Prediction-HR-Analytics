@@ -1,20 +1,25 @@
-from groq import Groq
 import os
-from dotenv import load_dotenv
+
+try:
+    from groq import Groq
+except ImportError:  # pragma: no cover - runtime fallback
+    Groq = None
+
+try:
+    from dotenv import load_dotenv
+except ImportError:  # pragma: no cover - runtime fallback
+    def load_dotenv():
+        return False
 
 # Load environment variables
 load_dotenv()
 
 # Get Groq API key
 api_key = os.getenv("GROQ_API_KEY")
+client = None
 
-if not api_key:
-    raise ValueError("GROQ_API_KEY not found in .env file")
-
-# Create Groq client
-client = Groq(
-    api_key=api_key
-)
+if Groq and api_key:
+    client = Groq(api_key=api_key)
 
 # Generate HR recommendation
 def generate_hr_recommendation(employee_data, risk, probability):
@@ -42,8 +47,14 @@ def generate_hr_recommendation(employee_data, risk, probability):
     Keep response concise and professional.
     """
 
-    try:
+    if client is None:
+        return (
+            "AI recommendations are unavailable right now, so here is a practical fallback: "
+            f"{risk} employees should be reviewed for workload balance, recognition, and career growth. "
+            f"Focus on improving satisfaction, reducing overtime, and offering targeted retention support."
+        )
 
+    try:
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[
@@ -59,5 +70,4 @@ def generate_hr_recommendation(employee_data, risk, probability):
         return response.choices[0].message.content
 
     except Exception as e:
-
         return f"Groq API Error: {str(e)}"
