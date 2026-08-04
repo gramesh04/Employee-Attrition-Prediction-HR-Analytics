@@ -1,9 +1,17 @@
+import os
 import streamlit as st
 import pickle
 import pandas as pd
 import numpy as np
 from pathlib import Path
 from gemini_service import generate_hr_recommendation
+
+# Hugging Face Spaces may run without a writable HOME directory; keep the app resilient.
+os.environ.setdefault("STREAMLIT_SERVER_HEADLESS", "true")
+os.environ.setdefault("STREAMLIT_SERVER_PORT", "8501")
+os.environ.setdefault("STREAMLIT_BROWSER_GATHER_USAGE_STATS", "false")
+os.environ.setdefault("STREAMLIT_SERVER_ENABLE_CORS", "false")
+os.environ.setdefault("STREAMLIT_SERVER_ENABLE_STATIC_SERVING", "true")
 
 # ---------------------------------------------------
 # PAGE CONFIG

@@ -13,6 +13,12 @@ Write-Host "  Hugging Face Spaces Deployment Helper  " -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
+# Ensure the app entry point is Streamlit-compatible for HF Spaces.
+if (!(Test-Path "app.py")) {
+    Write-Host "❌ app.py not found. Run this script from the project root." -ForegroundColor Red
+    exit 1
+}
+
 # Step 1: Check Git
 Write-Host "[1/5] Checking Git installation..." -ForegroundColor Yellow
 if (!(Get-Command git -ErrorAction SilentlyContinue)) {
