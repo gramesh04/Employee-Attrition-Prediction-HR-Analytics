@@ -159,6 +159,7 @@ p, li {
 .ai-response {
     background: #111827;
     border-radius: 24px;
+<<<<<<< HEAD
     padding: 28px;
     border: 1px solid #1e293b;
     margin-top: 0.5rem;
@@ -166,6 +167,14 @@ p, li {
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
+=======
+    padding: 30px;
+    border: 1px solid #1e293b;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 25px;
+    max-width: 1000px;
+>>>>>>> 1a9ae2c623299fed8e623b6daaa91e80a7a286db
     box-shadow: 0px 6px 20px rgba(0,0,0,0.25);
 }
 
@@ -182,10 +191,16 @@ p, li {
 
 .ai-response h1,
 .ai-response h2,
+<<<<<<< HEAD
 .ai-response h3 {
     margin-top: 1rem;
     margin-bottom: 0.8rem;
     color: white;
+=======
+.ai-response h3,
+.ai-response strong {
+    color: white !important;
+>>>>>>> 1a9ae2c623299fed8e623b6daaa91e80a7a286db
 }
 
 /* METRICS */
@@ -513,7 +528,34 @@ if st.button("Analyze Workforce Risk", use_container_width=True):
             )
 
         # ---------------------------------------------------
+<<<<<<< HEAD
         # AI RESPONSE
+=======
+        # AI HR INSIGHTS TITLE
+        # ---------------------------------------------------
+
+        st.markdown(
+            """
+            <div style="
+                text-align:center;
+                margin-top:20px;
+                margin-bottom:15px;
+            ">
+                <h2 style="
+                    color:white;
+                    font-size:32px;
+                    font-weight:700;
+                ">
+                    AI HR Insights
+                </h2>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # ---------------------------------------------------
+        # AI RESPONSE BOX
+>>>>>>> 1a9ae2c623299fed8e623b6daaa91e80a7a286db
         # ---------------------------------------------------
 
         ai_response = generate_hr_recommendation(
@@ -523,6 +565,7 @@ if st.button("Analyze Workforce Risk", use_container_width=True):
         )
 
         st.markdown(
+<<<<<<< HEAD
             f"""
             <div style="
                 max-width:1000px;
@@ -543,6 +586,16 @@ if st.button("Analyze Workforce Risk", use_container_width=True):
 
             </div>
             """,
+=======
+            '<div class="ai-response">',
+            unsafe_allow_html=True
+        )
+
+        st.markdown(ai_response)
+
+        st.markdown(
+            '</div>',
+>>>>>>> 1a9ae2c623299fed8e623b6daaa91e80a7a286db
             unsafe_allow_html=True
         )
 
@@ -607,7 +660,11 @@ if st.button("Analyze Workforce Risk", use_container_width=True):
 
         st.dataframe(
             summary_df,
+<<<<<<< HEAD
             width='stretch',
+=======
+            use_container_width=True,
+>>>>>>> 1a9ae2c623299fed8e623b6daaa91e80a7a286db
             hide_index=True
         )
 
@@ -645,6 +702,7 @@ st.sidebar.markdown("""
 - Llama 3.1
 - Pandas
 - NumPy
+<<<<<<< HEAD
 """)
 
 st.sidebar.markdown("""
@@ -658,3 +716,6 @@ st.sidebar.markdown("""
 - **Department:** Work department
 - **Salary:** Compensation level
 """)
+=======
+""")
+>>>>>>> 1a9ae2c623299fed8e623b6daaa91e80a7a286db

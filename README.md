@@ -277,6 +277,7 @@ python quickstart.py           # Automated setup
 # Or http://localhost:5000 (Flask)
 ```
 
+<<<<<<< HEAD
 ## � Hugging Face Spaces Deployment
 
 This project is ready to be deployed as a Streamlit app on Hugging Face Spaces.
@@ -297,6 +298,9 @@ This project is ready to be deployed as a Streamlit app on Hugging Face Spaces.
 https://huggingface.co/spaces/<your-username>/Employee-Attrition-Predictor
 
 ## �📖 Documentation
+=======
+## 📖 Documentation
+>>>>>>> 1a9ae2c623299fed8e623b6daaa91e80a7a286db
 
 | Document | Purpose |
 |----------|---------|
