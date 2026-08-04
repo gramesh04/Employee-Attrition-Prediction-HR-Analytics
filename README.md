@@ -277,8 +277,7 @@ python quickstart.py           # Automated setup
 # Or http://localhost:5000 (Flask)
 ```
 
-<<<<<<< HEAD
-## � Hugging Face Spaces Deployment
+## 🚀 Hugging Face Spaces Deployment
 
 This project is ready to be deployed as a Streamlit app on Hugging Face Spaces.
 
@@ -288,19 +287,16 @@ This project is ready to be deployed as a Streamlit app on Hugging Face Spaces.
 3. Make sure the Space includes:
    - app.py
    - requirements.txt
-   - hr_rf1.pickle
    - gemini_service.py
-4. In the Space settings, keep the app entry point as app.py.
-5. The app will start automatically with Streamlit.
-6. If the container stops right after startup, make sure the Space is using the Streamlit SDK and not a custom command that exits early.
+4. If you want predictions to work, upload the trained model file as hr_rf1.pickle in the Space repository or generate it during deployment.
+5. In the Space settings, keep the app entry point as app.py.
+6. The app will start automatically with Streamlit.
+7. If the container stops right after startup, make sure the Space is using the Streamlit SDK and not a custom command that exits early.
 
 ### Expected app URL
 https://huggingface.co/spaces/<your-username>/Employee-Attrition-Predictor
 
-## �📖 Documentation
-=======
 ## 📖 Documentation
->>>>>>> 1a9ae2c623299fed8e623b6daaa91e80a7a286db
 
 | Document | Purpose |
 |----------|---------|
