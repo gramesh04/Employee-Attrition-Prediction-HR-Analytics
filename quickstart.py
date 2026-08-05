@@ -240,3 +240,4 @@ if __name__ == '__main__':
     except Exception as e:
         print(f"\n❌ Unexpected error: {e}")
         print("For help, see SETUP_GUIDE.md\n")
+# Updated 2026-08-05 for GitHub timestamp refresh

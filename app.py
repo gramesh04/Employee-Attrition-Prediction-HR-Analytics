@@ -665,3 +665,4 @@ st.sidebar.markdown("""
 - **Department:** Work department
 - **Salary:** Compensation level
 """)
+# Updated 2026-08-05 for GitHub timestamp refresh

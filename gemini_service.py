@@ -70,4 +70,4 @@ def generate_hr_recommendation(employee_data, risk, probability):
         return response.choices[0].message.content
 
     except Exception as e:
-        return f"Groq API Error: {str(e)}"
+        return f"Groq API Error: {str(e)}"# Updated 2026-08-05 for GitHub timestamp refresh

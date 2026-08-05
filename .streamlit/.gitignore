@@ -1,4 +1,4 @@
 .venv/
 .env
 __pycache__/
-*.pyc
+*.pyc# Updated 2026-08-05 for GitHub timestamp refresh

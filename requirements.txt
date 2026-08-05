@@ -5,3 +5,4 @@ scikit-learn>=1.3.0
 xgboost>=2.0.0
 groq>=0.10.0
 python-dotenv>=1.0.0
+# Updated 2026-08-05 for GitHub timestamp refresh
